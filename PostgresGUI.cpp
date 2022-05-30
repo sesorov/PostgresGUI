@@ -5,3 +5,5 @@ PostgresGUI::PostgresGUI(QWidget *parent)
 {
     ui.setupUi(this);
 }
+
+void PostgresGUI::addUser()
