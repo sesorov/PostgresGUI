@@ -27,4 +27,7 @@ public:
 	bool update();
 	void search();
 	void getAll();
+
+	// Other
+	QSqlDatabase getDatabase();
 };

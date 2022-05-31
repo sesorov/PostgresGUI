@@ -18,6 +18,7 @@ class UserManager
 public:
     QJsonArray getUsers();
     UserManager(QString);
-    void addUser(QString username, QString connectionString);
+    void addUser(QString databaseName, QString username, QString password);
+    bool checkCredentials(QString username, QString password);
+    QJsonObject getUserInfo(QString username, QString password);
 };
-

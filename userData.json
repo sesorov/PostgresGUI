@@ -1,0 +1,9 @@
+{
+    "users": [
+        {
+            "connectionString": "test-connection-str",
+            "username": "testusername",
+            "password":  "testpassword"
+        }
+    ]
+}

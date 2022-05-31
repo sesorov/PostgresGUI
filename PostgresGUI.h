@@ -21,13 +21,13 @@
 #include <qjsondocument>
 #include <qjsonobject>
 #include <qjsonarray>
+#include "UserManager.h"
 
 class PostgresGUI : public QMainWindow
 {
     Q_OBJECT
-
 public slots:
-    void addUser();
+    void login();
 
 public:
     PostgresGUI(QWidget *parent = Q_NULLPTR);
@@ -35,4 +35,9 @@ public:
 
 private:
     Ui::PostgresGUIClass ui;
+    QStandardItemModel* model;
+    QListWidget connections;
+    QSqlDatabase db;
+    UserManager userManager;
+    QJsonObject currentUser;
 };
