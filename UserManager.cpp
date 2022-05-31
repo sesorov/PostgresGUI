@@ -1,7 +1,9 @@
 #include "UserManager.h"
 
-void UserManager::addUser(QString username, QString connectionString)
+void UserManager::addUser(QString databaseName, QString username, QString password)
 {
+	QString connectionString = QString("Driver={PostgreSQL Unicode};Server=localhost;Database=%1;Uid=%2;Pwd=%3;").arg(databaseName, username, password);
+
 	// Get (or create) current users array from json
 	QJsonObject dataObject = userData.object();
 	QJsonArray usersArray = dataObject["users"].toArray();
@@ -9,11 +11,52 @@ void UserManager::addUser(QString username, QString connectionString)
 	// Prepare new user info
 	QJsonObject newUser;
 	newUser["username"] = username;
+	newUser["password"] = password;
 	newUser["connectionString"] = connectionString;
 
 	// Add new user
 	usersArray.append(newUser);
 	dataObject["users"] = usersArray;
+
+	// Save data
+	userData.setObject(dataObject);
+	QFile jsonFile(fileName);
+	jsonFile.open(QIODevice::WriteOnly);
+	jsonFile.write(userData.toJson());
+	jsonFile.close();
+}
+
+bool UserManager::checkCredentials(QString username, QString password)
+{
+	QJsonObject dataObject = userData.object();
+	QJsonArray usersArray = dataObject["users"].toArray();
+	bool exists = false;
+	for(const auto userInfo: usersArray)
+	{
+		QJsonObject element = userInfo.toObject();
+		if (element.value("username") == username && element.value("password") == password)
+		{ 
+			exists = true;
+			break;
+		}
+	}
+	return exists;
+}
+
+QJsonObject UserManager::getUserInfo(QString username, QString password)
+{
+	QJsonObject dataObject = userData.object();
+	QJsonArray usersArray = dataObject["users"].toArray();
+	QJsonObject user;
+	for (const auto userInfo : usersArray)
+	{
+		QJsonObject element = userInfo.toObject();
+		if (element.value("username") == username && element.value("password") == password)
+		{
+			return element;
+		}
+	}
+	return user;
 }
 
 QJsonArray UserManager::getUsers() {

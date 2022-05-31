@@ -1,6 +1,6 @@
 #include "DBManager.h"
 
-QSqlDatabase getDatabase()
+QSqlDatabase DBManager::getDatabase()
 {
     QSqlDatabase db = QSqlDatabase::addDatabase("QPSQL");
     db.setHostName("localhost");
