@@ -14,11 +14,13 @@ class DBManager
 	QString connector;
 public:
 	DBManager(QString databaseName, QString tableName, QString connector) : databaseName(databaseName), tableName(tableName), connector(connector) {}
+	DBManager() {};
 
 	// General DB management options
 	void createUser(QString username, QString password, bool admin);
 	void clean();
 	void create();
+	void createTable();
 	void drop();
 
 	// Basic operations
@@ -26,8 +28,9 @@ public:
 	bool remove();
 	bool update();
 	void search();
-	void getAll();
+	QStandardItemModel* getAll();
 
 	// Other
-	QSqlDatabase getDatabase();
+	QSqlDatabase getDatabase(QString customDBName = NULL);
+	QString getDatabaseName();
 };
