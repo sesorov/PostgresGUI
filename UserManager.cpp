@@ -1,8 +1,8 @@
 #include "UserManager.h"
 
-void UserManager::addUser(QString databaseName, QString username, QString password)
+void UserManager::addUser(QString databaseName, QString username, QString password, bool isAdmin)
 {
-	QString connectionString = QString("Driver={PostgreSQL Unicode};Server=localhost;Database=%1;Uid=%2;Pwd=%3;").arg(databaseName, username, password);
+	QString connectionString = getConnectionString(databaseName, username, password);
 
 	// Get (or create) current users array from json
 	QJsonObject dataObject = userData.object();
@@ -12,6 +12,7 @@ void UserManager::addUser(QString databaseName, QString username, QString passwo
 	QJsonObject newUser;
 	newUser["username"] = username;
 	newUser["password"] = password;
+	newUser["isAdmin"] = isAdmin;
 	newUser["connectionString"] = connectionString;
 
 	// Add new user
@@ -24,6 +25,11 @@ void UserManager::addUser(QString databaseName, QString username, QString passwo
 	jsonFile.open(QIODevice::WriteOnly);
 	jsonFile.write(userData.toJson());
 	jsonFile.close();
+}
+
+QString UserManager::getConnectionString(QString databaseName, QString username, QString password)
+{
+	return QString("Driver={PostgreSQL Unicode};Server=localhost;Database=%1;Uid=%2;Pwd=%3;").arg(databaseName, username, password);
 }
 
 bool UserManager::checkCredentials(QString username, QString password)

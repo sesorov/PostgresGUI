@@ -247,12 +247,12 @@
      <rect>
       <x>160</x>
       <y>80</y>
-      <width>80</width>
+      <width>111</width>
       <height>24</height>
      </rect>
     </property>
     <property name="text">
-     <string>Create</string>
+     <string>Create/Open</string>
     </property>
    </widget>
    <widget class="QPushButton" name="deleteDatabaseButton">
@@ -260,7 +260,7 @@
      <rect>
       <x>160</x>
       <y>110</y>
-      <width>80</width>
+      <width>111</width>
       <height>24</height>
      </rect>
     </property>
@@ -273,7 +273,7 @@
      <rect>
       <x>160</x>
       <y>140</y>
-      <width>80</width>
+      <width>111</width>
       <height>24</height>
      </rect>
     </property>
@@ -515,16 +515,6 @@
      <string>View box</string>
     </property>
    </widget>
-   <widget class="QTextBrowser" name="textBrowser">
-    <property name="geometry">
-     <rect>
-      <x>290</x>
-      <y>20</y>
-      <width>351</width>
-      <height>151</height>
-     </rect>
-    </property>
-   </widget>
    <widget class="QLabel" name="label_17">
     <property name="geometry">
      <rect>
@@ -564,6 +554,16 @@
      <string>Delete all matching by any field from left:</string>
     </property>
    </widget>
+   <widget class="QTableView" name="tableView">
+    <property name="geometry">
+     <rect>
+      <x>290</x>
+      <y>20</y>
+      <width>351</width>
+      <height>151</height>
+     </rect>
+    </property>
+   </widget>
   </widget>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
@@ -587,8 +587,59 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>addUserButton</sender>
+   <signal>clicked()</signal>
+   <receiver>PostgresGUIClass</receiver>
+   <slot>addUser()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>62</x>
+     <y>353</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>366</x>
+     <y>11</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>createDatabaseButton</sender>
+   <signal>clicked()</signal>
+   <receiver>PostgresGUIClass</receiver>
+   <slot>addDatabase()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>225</x>
+     <y>91</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>345</x>
+     <y>6</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>deleteDatabaseButton</sender>
+   <signal>clicked()</signal>
+   <receiver>PostgresGUIClass</receiver>
+   <slot>dropDatabase()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>257</x>
+     <y>124</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>380</x>
+     <y>7</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>login()</slot>
+  <slot>addUser()</slot>
+  <slot>addDatabase()</slot>
+  <slot>dropDatabase()</slot>
  </slots>
 </ui>
