@@ -61,12 +61,17 @@ void PostgresGUI::addUser()
 
 void PostgresGUI::addDatabase()
 {
+    QString databaseName = ui.databaseNameLineEdit->text();
     if (this->currentUser.isEmpty())
     {
         QMessageBox::warning(this, "Access restricted", "Please, log in to act with databases.");
         return;
     }
-    QString databaseName = ui.databaseNameLineEdit->text();
+    if (databaseName.isEmpty())
+    {
+        QMessageBox::warning(this, "No database selected", "Please, type database name.");
+        return;
+    }
     QString username = QString(this->currentUser.value("username").toString());
     QString password = QString(this->currentUser.value("password").toString());
     this->dbManager = DBManager(databaseName, QString("main"), this->userManager.getConnectionString(databaseName, username, password));
@@ -93,6 +98,70 @@ void PostgresGUI::dropDatabase()
     QMessageBox::information(this, "Database removed", "Removed database successfully.");
 }
 
+// Records operations
+
+void PostgresGUI::addRecord()
+{
+    QString name = ui.nameLineEdit->text();
+    QString surname = ui.surnameLineEdit->text();
+    QString phone = ui.phoneLineEdit->text();
+    if (name.isEmpty() || surname.isEmpty() || phone.isEmpty())
+    {
+        QMessageBox::warning(this, "Fill in all gaps", "Please, fill all the gaps (name, surname, phone).");
+        return;
+    }
+    if (this->currentUser.isEmpty() || !this->currentUser.value("isAdmin").toBool())
+    {
+        QMessageBox::warning(this, "Access restricted: view-only", "Please, log in with administrator permissions to perform insert.");
+        return;
+    }
+    if (this->dbManager.getDatabaseName().isEmpty())
+    {
+        QMessageBox::warning(this, "No database selected", "Please, select database in <Database operations> for inserting.");
+        return;
+    }
+    bool status = dbManager.insert(name, surname, phone);
+    if (!status)
+    {
+        QMessageBox::warning(this, "System error", "Could not add record to database. Ckeck logs.");
+        return;
+    }
+    ui.tableView->setModel(this->dbManager.getAll());
+    ui.tableView->setShowGrid(true);
+    ui.tableView->show();
+    QMessageBox::information(this, "New record added", "New record added successfully.");
+}
+
+void PostgresGUI::search()
+{
+    QString id = ui.idLineEdit->text();
+    QString name = ui.nameLineEdit->text();
+    QString surname = ui.surnameLineEdit->text();
+    QString phone = ui.phoneLineEdit->text();
+
+    if (id.isEmpty() && name.isEmpty() && surname.isEmpty() && phone.isEmpty())
+    {
+        QMessageBox::warning(this, "No data provided", "Please, fill at least one gap to search by.");
+        return;
+    }
+    if (this->currentUser.isEmpty())
+    {
+        QMessageBox::warning(this, "Log in", "Please, log in to perform search.");
+        return;
+    }
+    if (this->dbManager.getDatabaseName().isEmpty())
+    {
+        QMessageBox::warning(this, "No database selected", "Please, select database in <Database operations> to search in.");
+        return;
+    }
+    ui.tableView->setModel(this->dbManager.search(id, name, surname, phone));
+    ui.tableView->setShowGrid(true);
+    ui.tableView->show();
+    QMessageBox::information(this, "Search successful", "See results in the display table. If it is empty, nothing was found.");
+}
+
+// Constructor/destructor
+
 PostgresGUI::PostgresGUI(QWidget *parent)
     : QMainWindow(parent), connections(QListWidget()), userManager(UserManager(QString("F:\\VS Projects\\PostgresGUI\\userData.json")))
 {
@@ -101,5 +170,5 @@ PostgresGUI::PostgresGUI(QWidget *parent)
 
 PostgresGUI::~PostgresGUI()
 {
-    if (!db.isOpen()) { db.close(); }
+    if (db.isOpen()) { db.close(); }
 }

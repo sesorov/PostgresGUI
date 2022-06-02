@@ -47,8 +47,9 @@ void DBManager::create()
         qDebug() << "[ERROR] Database connection was not established: " + query.lastError().text();
         qDebug() << query.lastQuery();
     }
-    // Create main table
+    // Create main table and set stored functions
     createTable();
+    setDefaultProcedures();
     if (db.isOpen()) db.close();
 }
 
@@ -80,6 +81,84 @@ void DBManager::createTable()
         qDebug() << query.lastQuery();
     }
     db.close();
+}
+
+void DBManager::setDefaultProcedures()
+{
+    QSqlDatabase db = getDatabase();
+    if (!db.isOpen()) db.open();
+    QSqlQuery query(db);
+
+    // Insert data
+    // SELECT InsertRecord('TestName2', 'TestSurname2', '+72224445566')
+    QString statementInsertProcedure = QString("CREATE OR REPLACE FUNCTION InsertRecord(IN r_name text, IN r_surname text, IN r_phone text)\n"
+                                               "RETURNS VOID AS\n$$\n"
+                                               "BEGIN\nINSERT INTO %1(name,surname,phone) VALUES(r_name, r_surname, r_phone);\n"
+                                               "END;\n$$\nlanguage plpgsql;").arg(tableName);
+    QString statementSearchProcedure = QString("CREATE OR REPLACE FUNCTION Search(IN s_id INT DEFAULT -1, IN s_name text DEFAULT NULL, IN s_surname text DEFAULT NULL, IN s_phone text DEFAULT NULL)\n"
+                                               "RETURNS TABLE(id INTEGER, name TEXT, surname TEXT, phone TEXT)\n"
+                                               "AS\n$$\nBEGIN\nRETURN QUERY\n"
+                                               "SELECT %1.id, %1.name, %1.surname, %1.phone FROM %1 WHERE ((s_id = -1 OR %1.id = s_id) AND (s_name = '' OR %1.name = s_name) "
+                                               "AND (s_surname = '' OR %1.surname = s_surname) AND (s_phone = '' OR s_phone = %1.phone));\n"
+                                               "END;\n$$\nlanguage plpgsql;").arg(tableName);
+
+    if (query.exec(statementInsertProcedure)) {
+        qDebug() << "[CONFIG] Added InsertRecord stored function.";
+    }
+    if (query.exec(statementSearchProcedure)) {
+        qDebug() << "[CONFIG] Added Search stored function.";
+    }
+}
+
+bool DBManager::insert(QString name, QString surname, QString phone)
+{
+    QString statementInsert = QString("SELECT InsertRecord('%1', '%2', '%3')").arg(name, surname, phone);
+
+    QSqlDatabase db = getDatabase();
+    if (!db.isOpen()) db.open();
+    QSqlQuery query(db);
+
+    return query.exec(statementInsert);
+}
+
+QStandardItemModel* DBManager::search(QString id, QString name, QString surname, QString phone)
+{
+    QStandardItemModel* records_match = new QStandardItemModel();
+    QStringList labels = QString::fromUtf8("ID,Name,Surname,Phone").simplified().split(",");
+    records_match->setHorizontalHeaderLabels(labels);
+    records_match->setColumnCount(4);
+
+    if (id.isEmpty()) id = QString("-1");
+
+    QString statementSearch = QString("SELECT * FROM Search(%1, '%2', '%3', '%4')").arg(id, name, surname, phone);
+
+    QSqlDatabase db = getDatabase();
+    db.setDatabaseName(databaseName);
+    if (!db.isOpen()) db.open();
+
+    QSqlQuery query(db);
+    bool status = query.exec(statementSearch);
+    if (status)
+    {
+        qDebug() << "[SUCCESS] Found matching records.";
+    }
+    else
+    {
+        qDebug() << "[WARNING] Could not find records that satisfy provided query.";
+        qDebug() << query.lastQuery();
+        return records_match;
+    }
+    while (query.next()) {
+        QList<QStandardItem*> items;
+
+        items.append(new QStandardItem(query.value(0).toString()));
+        items.append(new QStandardItem(query.value(1).toString()));
+        items.append(new QStandardItem(query.value(2).toString()));
+        items.append(new QStandardItem(query.value(3).toString()));
+        records_match->appendRow(items);
+    }
+    db.close();
+    return records_match;
 }
 
 void DBManager::drop()

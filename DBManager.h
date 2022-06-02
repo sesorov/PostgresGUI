@@ -24,13 +24,14 @@ public:
 	void drop();
 
 	// Basic operations
-	bool insert();
+	bool insert(QString name, QString surname, QString phone);
 	bool remove();
 	bool update();
-	void search();
+	QStandardItemModel* search(QString id = NULL, QString name = NULL, QString surname = NULL, QString phone = NULL);
 	QStandardItemModel* getAll();
 
 	// Other
 	QSqlDatabase getDatabase(QString customDBName = NULL);
 	QString getDatabaseName();
+	void setDefaultProcedures();
 };
