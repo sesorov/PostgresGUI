@@ -32,6 +32,8 @@ public slots:
     void addUser();
     void addDatabase();
     void dropDatabase();
+    void addRecord();
+    void search();
 
 public:
     PostgresGUI(QWidget *parent = Q_NULLPTR);

@@ -320,20 +320,7 @@
      <enum>Qt::Horizontal</enum>
     </property>
    </widget>
-   <widget class="QLabel" name="label_10">
-    <property name="geometry">
-     <rect>
-      <x>150</x>
-      <y>190</y>
-      <width>111</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Database name:</string>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="databaseNameRecordsLineEdit">
+   <widget class="QLineEdit" name="nameLineEdit">
     <property name="geometry">
      <rect>
       <x>150</x>
@@ -346,24 +333,11 @@
      <string/>
     </property>
    </widget>
-   <widget class="QLineEdit" name="nameLineEdit">
-    <property name="geometry">
-     <rect>
-      <x>150</x>
-      <y>260</y>
-      <width>113</width>
-      <height>24</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-   </widget>
    <widget class="QLabel" name="label_11">
     <property name="geometry">
      <rect>
       <x>150</x>
-      <y>240</y>
+      <y>190</y>
       <width>111</width>
       <height>16</height>
      </rect>
@@ -401,8 +375,8 @@
    <widget class="QPushButton" name="addRecordButton">
     <property name="geometry">
      <rect>
-      <x>460</x>
-      <y>220</y>
+      <x>320</x>
+      <y>210</y>
       <width>111</width>
       <height>24</height>
      </rect>
@@ -412,45 +386,6 @@
     </property>
    </widget>
    <widget class="QLineEdit" name="idLineEdit">
-    <property name="geometry">
-     <rect>
-      <x>280</x>
-      <y>210</y>
-      <width>113</width>
-      <height>24</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_13">
-    <property name="geometry">
-     <rect>
-      <x>280</x>
-      <y>190</y>
-      <width>111</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>ID (not required):</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="updateRecordButton">
-    <property name="geometry">
-     <rect>
-      <x>460</x>
-      <y>270</y>
-      <width>111</width>
-      <height>24</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Update</string>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="surnameLineEdit">
     <property name="geometry">
      <rect>
       <x>150</x>
@@ -463,11 +398,50 @@
      <string/>
     </property>
    </widget>
-   <widget class="QLabel" name="label_14">
+   <widget class="QLabel" name="label_13">
     <property name="geometry">
      <rect>
       <x>150</x>
       <y>340</y>
+      <width>111</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>ID (not required):</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="updateRecordButton">
+    <property name="geometry">
+     <rect>
+      <x>320</x>
+      <y>260</y>
+      <width>111</width>
+      <height>24</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Update</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="surnameLineEdit">
+    <property name="geometry">
+     <rect>
+      <x>150</x>
+      <y>260</y>
+      <width>113</width>
+      <height>24</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_14">
+    <property name="geometry">
+     <rect>
+      <x>150</x>
+      <y>240</y>
       <width>111</width>
       <height>16</height>
      </rect>
@@ -492,8 +466,8 @@
    <widget class="QPushButton" name="deleteRecordButton">
     <property name="geometry">
      <rect>
-      <x>460</x>
-      <y>320</y>
+      <x>450</x>
+      <y>260</y>
       <width>111</width>
       <height>24</height>
      </rect>
@@ -518,8 +492,8 @@
    <widget class="QLabel" name="label_17">
     <property name="geometry">
      <rect>
-      <x>460</x>
-      <y>200</y>
+      <x>320</x>
+      <y>190</y>
       <width>91</width>
       <height>16</height>
      </rect>
@@ -531,8 +505,8 @@
    <widget class="QLabel" name="label_18">
     <property name="geometry">
      <rect>
-      <x>460</x>
-      <y>250</y>
+      <x>320</x>
+      <y>240</y>
       <width>121</width>
       <height>16</height>
      </rect>
@@ -544,14 +518,14 @@
    <widget class="QLabel" name="label_19">
     <property name="geometry">
      <rect>
-      <x>410</x>
-      <y>300</y>
-      <width>231</width>
+      <x>450</x>
+      <y>240</y>
+      <width>121</width>
       <height>20</height>
      </rect>
     </property>
     <property name="text">
-     <string>Delete all matching by any field from left:</string>
+     <string>Delete all matching:</string>
     </property>
    </widget>
    <widget class="QTableView" name="tableView">
@@ -562,6 +536,45 @@
       <width>351</width>
       <height>151</height>
      </rect>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_20">
+    <property name="geometry">
+     <rect>
+      <x>450</x>
+      <y>190</y>
+      <width>121</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Search all matching:</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="searchRecordButton">
+    <property name="geometry">
+     <rect>
+      <x>450</x>
+      <y>210</y>
+      <width>111</width>
+      <height>24</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Search</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_10">
+    <property name="geometry">
+     <rect>
+      <x>280</x>
+      <y>300</y>
+      <width>331</width>
+      <height>81</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:18pt; font-weight:700;&quot;&gt;Created by&lt;/span&gt;&lt;/p&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:18pt; font-weight:700;&quot;&gt;Alexander Sesorov&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
     </property>
    </widget>
   </widget>
@@ -635,11 +648,45 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>addRecordButton</sender>
+   <signal>clicked()</signal>
+   <receiver>PostgresGUIClass</receiver>
+   <slot>addRecord()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>373</x>
+     <y>222</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>402</x>
+     <y>1</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>searchRecordButton</sender>
+   <signal>clicked()</signal>
+   <receiver>PostgresGUIClass</receiver>
+   <slot>search()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>492</x>
+     <y>219</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>419</x>
+     <y>13</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>login()</slot>
   <slot>addUser()</slot>
   <slot>addDatabase()</slot>
   <slot>dropDatabase()</slot>
+  <slot>addRecord()</slot>
+  <slot>search()</slot>
  </slots>
 </ui>
