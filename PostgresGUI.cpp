@@ -54,6 +54,7 @@ void PostgresGUI::addUser()
     }
 
     this->userManager.addUser(this->dbManager.getDatabaseName(), new_username, new_password, isAdmin);
+    this->dbManager.createUser(new_username, new_password, isAdmin);
     QMessageBox::information(this, "User created", "New user created successfully.");
 }
 
@@ -74,7 +75,7 @@ void PostgresGUI::addDatabase()
     }
     QString username = QString(this->currentUser.value("username").toString());
     QString password = QString(this->currentUser.value("password").toString());
-    this->dbManager = DBManager(databaseName, QString("main"), this->userManager.getConnectionString(databaseName, username, password));
+    this->dbManager = DBManager(databaseName, QString("main"), this->currentUser);
     this->dbManager.create();
     ui.tableView->setModel(this->dbManager.getAll());
     ui.tableView->setShowGrid(true);
@@ -84,9 +85,9 @@ void PostgresGUI::addDatabase()
 
 void PostgresGUI::dropDatabase()
 {
-    if (this->currentUser.isEmpty() || !this->currentUser.value("isAdmin").toBool())
+    if (this->currentUser.isEmpty())
     {
-        QMessageBox::warning(this, "Access restricted", "Please, log in with administrator permissions to drop database.");
+        QMessageBox::warning(this, "Not logged in", "Please, log in to perform actions with database.");
         return;
     }
     if (this->dbManager.getDatabaseName().isEmpty())
@@ -94,8 +95,15 @@ void PostgresGUI::dropDatabase()
         QMessageBox::warning(this, "No database selected", "Please, select database in <Database operations> for removal.");
         return;
     }
-    this->dbManager.drop();
-    QMessageBox::information(this, "Database removed", "Removed database successfully.");
+    if (this->dbManager.drop())
+    {
+        QMessageBox::information(this, "Database removed", "Removed database successfully.");
+    }
+    else
+    {
+        QMessageBox::warning(this, "Access restricted", "Please, log in with administrator permissions to drop database.");
+    }
+    return;
 }
 
 // Records operations
@@ -110,9 +118,9 @@ void PostgresGUI::addRecord()
         QMessageBox::warning(this, "Fill in all gaps", "Please, fill all the gaps (name, surname, phone).");
         return;
     }
-    if (this->currentUser.isEmpty() || !this->currentUser.value("isAdmin").toBool())
+    if (this->currentUser.isEmpty())
     {
-        QMessageBox::warning(this, "Access restricted: view-only", "Please, log in with administrator permissions to perform insert.");
+        QMessageBox::warning(this, "Not logged in", "Please, log in to perform actions with database.");
         return;
     }
     if (this->dbManager.getDatabaseName().isEmpty())
@@ -123,7 +131,7 @@ void PostgresGUI::addRecord()
     bool status = dbManager.insert(name, surname, phone);
     if (!status)
     {
-        QMessageBox::warning(this, "System error", "Could not add record to database. Ckeck logs.");
+        QMessageBox::warning(this, "Access restricted: view-only", "Please, log in with administrator permissions to perform insert.");
         return;
     }
     ui.tableView->setModel(this->dbManager.getAll());

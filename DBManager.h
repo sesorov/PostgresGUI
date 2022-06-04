@@ -6,22 +6,23 @@
 #include <qsqlerror.h>
 #include <qstandarditemmodel.h>
 #include <QMap>
+#include <qjsonobject>
 
 class DBManager
 {
 	QString databaseName;
 	QString tableName;
-	QString connector;
+	QJsonObject user;
 public:
-	DBManager(QString databaseName, QString tableName, QString connector) : databaseName(databaseName), tableName(tableName), connector(connector) {}
+	DBManager(QString databaseName, QString tableName, QJsonObject user) : databaseName(databaseName), tableName(tableName), user(user) {}
 	DBManager() {};
 
 	// General DB management options
 	void createUser(QString username, QString password, bool admin);
 	void clean();
-	void create();
+	bool create();
 	void createTable();
-	void drop();
+	bool drop();
 
 	// Basic operations
 	bool insert(QString name, QString surname, QString phone);
