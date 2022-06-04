@@ -20,6 +20,5 @@ public:
     UserManager(QString);
     void addUser(QString databaseName, QString username, QString password, bool isAdmin = false);
     bool checkCredentials(QString username, QString password);
-    QString getConnectionString(QString databaseName, QString username, QString password);
     QJsonObject getUserInfo(QString username, QString password);
 };

@@ -4,8 +4,8 @@ QSqlDatabase DBManager::getDatabase(QString customDBName)
 {
     QSqlDatabase db = QSqlDatabase::addDatabase("QPSQL");
     db.setHostName("localhost");
-    db.setPassword("3719");
-    db.setUserName("postgres");
+    db.setPassword(user.value("password").toString());
+    db.setUserName(user.value("username").toString());
     db.setDatabaseName(customDBName.isEmpty() ? databaseName : customDBName);
     tableName = "main";
     return db;
@@ -20,7 +20,15 @@ void DBManager::createUser(QString username, QString password, bool isAdmin)
 {
     QSqlDatabase db = getDatabase();
     QString statementCreateUser = QString("CREATE USER %1 WITH ENCRYPTED PASSWORD '%2';").arg(username, password);
-    QString statementRights = isAdmin ? QString("GRANT ALL PRIVILEGES ON DATABASE %1 TO %2").arg(databaseName, username) : QString("GRANT SELECT ON %1 TO %2;").arg(tableName, username);
+    QString statementRights = isAdmin ? QString("GRANT ALL PRIVILEGES ON DATABASE %1 TO %2;\n"
+                                                "GRANT ALL ON ALL TABLES IN SCHEMA public TO %2;\n"
+                                                "GRANT ALL ON ALL SEQUENCES IN SCHEMA public TO %2;\n"
+                                                "GRANT ALL ON ALL FUNCTIONS IN SCHEMA public TO %2;\n"
+                                                "ALTER USER %2 WITH SUPERUSER;").arg(databaseName, username) : 
+                                        QString("GRANT CONNECT ON DATABASE %1 TO %2;\n"
+                                                "GRANT USAGE ON SCHEMA public TO %2;\n"
+                                                "GRANT SELECT ON ALL TABLES IN SCHEMA public TO %2;\n"
+                                                "GRANT SELECT ON ALL SEQUENCES IN SCHEMA public TO %2;\n").arg(databaseName, username);
     if (!db.isOpen()) db.open();
     QSqlQuery query(db);
     if (query.exec(statementCreateUser) && query.exec(statementRights)) {
@@ -33,24 +41,38 @@ void DBManager::createUser(QString username, QString password, bool isAdmin)
     db.close();
 }
 
-void DBManager::create()
+bool DBManager::create()
 {
     // Create database
     QSqlDatabase db = getDatabase("main");
     if (!db.isOpen()) db.open();
     QString statementCreateDatabase = QString("CREATE DATABASE %1;").arg(databaseName);
+    QString statementExists = QString("select exists(SELECT datname FROM pg_catalog.pg_database WHERE lower(datname) = lower('%1'));").arg(databaseName);
     QSqlQuery query(db);
-    if (query.exec(statementCreateDatabase)) {
-        qDebug() << "[SUCCESS] Connected to database " << databaseName << " successfully.";
+
+    query.exec(statementExists);
+    bool exists = false;
+    while (query.next()) {
+        exists = query.value(0).toBool();
     }
-    else {
-        qDebug() << "[ERROR] Database connection was not established: " + query.lastError().text();
-        qDebug() << query.lastQuery();
+    if (!exists)
+    {
+        bool output = query.exec(statementCreateDatabase);
+        if (output) {
+            qDebug() << "[SUCCESS] Connected to database " << databaseName << " successfully.";
+            createTable();
+            setDefaultProcedures();
+            if (db.isOpen()) db.close();
+        }
+        else {
+            qDebug() << "[ERROR] Database connection was not established: " + query.lastError().text();
+            qDebug() << query.lastQuery();
+        }
+        // Create main table and set stored functions
+        return output;
     }
-    // Create main table and set stored functions
-    createTable();
-    setDefaultProcedures();
     if (db.isOpen()) db.close();
+    return exists;
 }
 
 void DBManager::createTable()
@@ -161,7 +183,7 @@ QStandardItemModel* DBManager::search(QString id, QString name, QString surname,
     return records_match;
 }
 
-void DBManager::drop()
+bool DBManager::drop()
 {
     QSqlDatabase db = getDatabase();
     db.setDatabaseName("main");
@@ -169,7 +191,8 @@ void DBManager::drop()
     QString dropOtherConnections = QString("SELECT pg_terminate_backend(pg_stat_activity.pid)\nFROM pg_stat_activity\nWHERE pg_stat_activity.datname = '%1'\nAND pid <> pg_backend_pid();").arg(databaseName);
     QString statementDropDatabase = QString("DROP DATABASE IF EXISTS %1;").arg(databaseName);
     QSqlQuery query(db);
-    if (query.exec(dropOtherConnections) && query.exec(statementDropDatabase)) {
+    bool output = query.exec(dropOtherConnections) && query.exec(statementDropDatabase);
+    if (output) {
         qDebug() << "[SUCCESS] Database " << databaseName << " has been dropped successfully.";
     }
     else {
@@ -177,6 +200,7 @@ void DBManager::drop()
         qDebug() << query.lastQuery();
     }
     db.close();
+    return output;
 }
 
 void DBManager::clean()
