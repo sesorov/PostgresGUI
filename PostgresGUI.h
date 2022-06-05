@@ -28,13 +28,20 @@ class PostgresGUI : public QMainWindow
 {
     Q_OBJECT
 public slots:
+    // Account options
     void login();
     void addUser();
+
+    // Database general actions
     void addDatabase();
     void dropDatabase();
-    void addRecord();
+    void clearDatabase();
+
+    // Records actions
     void search();
+    void addRecord();
     void updateRecord();
+    void deleteRecord();
 
 public:
     PostgresGUI(QWidget *parent = Q_NULLPTR);

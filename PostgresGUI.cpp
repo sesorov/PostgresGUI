@@ -106,6 +106,30 @@ void PostgresGUI::dropDatabase()
     return;
 }
 
+void PostgresGUI::clearDatabase()
+{
+    if (this->currentUser.isEmpty())
+    {
+        QMessageBox::warning(this, "Not logged in", "Please, log in to perform actions with database.");
+        return;
+    }
+    if (this->dbManager.getDatabaseName().isEmpty())
+    {
+        QMessageBox::warning(this, "No database selected", "Please, select database in <Database operations> for cleanup.");
+        return;
+    }
+    if (this->dbManager.clean())
+    {
+        ui.tableView->setModel(this->dbManager.getAll());
+        ui.tableView->setShowGrid(true);
+        ui.tableView->show();
+        QMessageBox::information(this, "Database cleaned", "Removed all records successfully.");
+        return;
+    }
+    QMessageBox::warning(this, "Access restricted", "Please, log in with administrator permissions to clean database.");
+    return;
+}
+
 // Records operations
 
 void PostgresGUI::addRecord()
@@ -197,6 +221,41 @@ void PostgresGUI::updateRecord()
     if (!status)
     {
         QMessageBox::warning(this, "Update error", "Please, check if the record with provided phone/id exists and you have administrator permissions.");
+        return;
+    }
+    ui.tableView->setModel(this->dbManager.getAll());
+    ui.tableView->setShowGrid(true);
+    ui.tableView->show();
+    QMessageBox::information(this, "Update successful", "Successfully updated record.");
+}
+
+void PostgresGUI::deleteRecord()
+{
+    // Delete by one/combination of these
+    QString id = ui.idLineEdit->text();
+    QString phone = ui.phoneLineEdit->text();
+    QString name = ui.nameLineEdit->text();
+    QString surname = ui.surnameLineEdit->text();
+
+    if (id.isEmpty() && phone.isEmpty() && name.isEmpty() && surname.isEmpty())
+    {
+        QMessageBox::warning(this, "No data provided", "Please, fill at least one gap (name, surname, phone or ID) to search by to delete.");
+        return;
+    }
+    if (this->currentUser.isEmpty())
+    {
+        QMessageBox::warning(this, "Log in", "Please, log in to perform removal.");
+        return;
+    }
+    if (this->dbManager.getDatabaseName().isEmpty())
+    {
+        QMessageBox::warning(this, "No database selected", "Please, select database in <Database operations> for removal.");
+        return;
+    }
+    bool status = dbManager.remove(id, name, surname, phone);
+    if (!status)
+    {
+        QMessageBox::warning(this, "Delete error", "Please, check if the record with provided phone/id exists and you have administrator permissions.");
         return;
     }
     ui.tableView->setModel(this->dbManager.getAll());
