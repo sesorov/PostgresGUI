@@ -34,6 +34,7 @@ public slots:
     void dropDatabase();
     void addRecord();
     void search();
+    void updateRecord();
 
 public:
     PostgresGUI(QWidget *parent = Q_NULLPTR);

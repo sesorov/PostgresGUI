@@ -680,6 +680,22 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>updateRecordButton</sender>
+   <signal>clicked()</signal>
+   <receiver>PostgresGUIClass</receiver>
+   <slot>updateRecord()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>376</x>
+     <y>271</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>548</x>
+     <y>6</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>login()</slot>
@@ -688,5 +704,6 @@
   <slot>dropDatabase()</slot>
   <slot>addRecord()</slot>
   <slot>search()</slot>
+  <slot>updateRecord()</slot>
  </slots>
 </ui>

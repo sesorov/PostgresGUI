@@ -27,7 +27,7 @@ public:
 	// Basic operations
 	bool insert(QString name, QString surname, QString phone);
 	bool remove();
-	bool update();
+	bool update(QString id = NULL, QString name = NULL, QString surname = NULL, QString phone = NULL);
 	QStandardItemModel* search(QString id = NULL, QString name = NULL, QString surname = NULL, QString phone = NULL);
 	QStandardItemModel* getAll();
 

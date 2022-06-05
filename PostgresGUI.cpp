@@ -168,6 +168,43 @@ void PostgresGUI::search()
     QMessageBox::information(this, "Search successful", "See results in the display table. If it is empty, nothing was found.");
 }
 
+void PostgresGUI::updateRecord()
+{
+    // search by one of these fields
+    QString id = ui.idLineEdit->text();
+    QString phone = ui.phoneLineEdit->text();
+
+    // update these fields (and phone from above) (ID cannot be changed)
+    QString name = ui.nameLineEdit->text();
+    QString surname = ui.surnameLineEdit->text();
+
+    if (id.isEmpty() && phone.isEmpty())
+    {
+        QMessageBox::warning(this, "No data provided", "Please, fill any of two unique gaps (Phone or ID) to search by to update.");
+        return;
+    }
+    if (this->currentUser.isEmpty())
+    {
+        QMessageBox::warning(this, "Log in", "Please, log in to perform update.");
+        return;
+    }
+    if (this->dbManager.getDatabaseName().isEmpty())
+    {
+        QMessageBox::warning(this, "No database selected", "Please, select database in <Database operations> for updating.");
+        return;
+    }
+    bool status = dbManager.update(id, name, surname, phone);
+    if (!status)
+    {
+        QMessageBox::warning(this, "Update error", "Please, check if the record with provided phone/id exists and you have administrator permissions.");
+        return;
+    }
+    ui.tableView->setModel(this->dbManager.getAll());
+    ui.tableView->setShowGrid(true);
+    ui.tableView->show();
+    QMessageBox::information(this, "Update successful", "Successfully updated record.");
+}
+
 // Constructor/destructor
 
 PostgresGUI::PostgresGUI(QWidget *parent)

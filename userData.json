@@ -1,9 +1,9 @@
 {
     "users": [
         {
-            "connectionString": "test-connection-str",
-            "username": "testusername",
-            "password":  "testpassword"
+            "isAdmin": true,
+            "password": "Why do you want to know it? it's just a sample record of my university project. Such a shame of you.",
+            "username": "postgres"
         }
     ]
 }

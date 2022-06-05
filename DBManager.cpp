@@ -123,12 +123,25 @@ void DBManager::setDefaultProcedures()
                                                "SELECT %1.id, %1.name, %1.surname, %1.phone FROM %1 WHERE ((s_id = -1 OR %1.id = s_id) AND (s_name = '' OR %1.name = s_name) "
                                                "AND (s_surname = '' OR %1.surname = s_surname) AND (s_phone = '' OR s_phone = %1.phone));\n"
                                                "END;\n$$\nlanguage plpgsql;").arg(tableName);
+    QString statementUpdateProcedure = QString("CREATE OR REPLACE FUNCTION UpdateRecord(IN u_id INT DEFAULT -1, IN u_name text DEFAULT NULL, IN u_surname text DEFAULT NULL, IN u_phone text DEFAULT NULL)\n"
+                                               "RETURNS VOID\nAS\n$$\nBEGIN\n"
+                                               "IF u_id != -1 THEN\nUPDATE public.%1 SET\n"
+                                               "name = COALESCE(NULLIF(u_name, ''), name),\n"
+                                               "surname = COALESCE(NULLIF(u_surname, ''), surname),\n"
+                                               "phone = COALESCE(NULLIF(u_phone, ''), phone)\n"
+                                               "WHERE %1.id = u_id;\nELSE\nUPDATE public.%1 SET\n"
+                                               "name = COALESCE(NULLIF(u_name, ''), name),\n"
+                                               "surname = COALESCE(NULLIF(u_surname, ''), surname)\n"
+                                               "WHERE %1.phone = u_phone;\nEND IF;\nEND;\n$$\nlanguage plpgsql;").arg(tableName);
 
     if (query.exec(statementInsertProcedure)) {
         qDebug() << "[CONFIG] Added InsertRecord stored function.";
     }
     if (query.exec(statementSearchProcedure)) {
         qDebug() << "[CONFIG] Added Search stored function.";
+    }
+    if (query.exec(statementUpdateProcedure)) {
+        qDebug() << "[CONFIG] Added UpdateRecord stored function.";
     }
 }
 
@@ -181,6 +194,19 @@ QStandardItemModel* DBManager::search(QString id, QString name, QString surname,
     }
     db.close();
     return records_match;
+}
+
+bool DBManager::update(QString id, QString name, QString surname, QString phone)
+{
+    if (id.isEmpty()) id = QString("-1");
+
+    QString statementUpdate = QString("SELECT UpdateRecord(%1, '%2', '%3', '%4')").arg(id, name, surname, phone);
+
+    QSqlDatabase db = getDatabase();
+    if (!db.isOpen()) db.open();
+    QSqlQuery query(db);
+
+    return query.exec(statementUpdate);
 }
 
 bool DBManager::drop()
