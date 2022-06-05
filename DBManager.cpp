@@ -133,6 +133,12 @@ void DBManager::setDefaultProcedures()
                                                "name = COALESCE(NULLIF(u_name, ''), name),\n"
                                                "surname = COALESCE(NULLIF(u_surname, ''), surname)\n"
                                                "WHERE %1.phone = u_phone;\nEND IF;\nEND;\n$$\nlanguage plpgsql;").arg(tableName);
+    QString statementDeleteProcedure = QString("CREATE OR REPLACE FUNCTION DeleteRecord(IN d_id INT DEFAULT -1, IN d_name text DEFAULT NULL, IN d_surname text DEFAULT NULL, IN d_phone text DEFAULT NULL)\n"
+                                               "RETURNS VOID\nAS\n$$\nBEGIN\n"
+                                               "DELETE FROM %1 WHERE ((d_id = -1 OR %1.id = d_id) AND (d_name = '' OR %1.name = d_name)\n"
+                                               "AND (d_surname = '' OR %1.surname = d_surname) AND (d_phone = '' OR d_phone = %1.phone));\n"
+                                               "END;\n$$\nlanguage plpgsql;").arg(tableName);
+    QString statementClearProcedure = QString("CREATE OR REPLACE FUNCTION Clear()\nRETURNS VOID\nAS\n$$\nBEGIN\nTRUNCATE %1;\nDELETE FROM %1;\nEND;\n$$\nlanguage plpgsql;").arg(tableName);
 
     if (query.exec(statementInsertProcedure)) {
         qDebug() << "[CONFIG] Added InsertRecord stored function.";
@@ -142,6 +148,12 @@ void DBManager::setDefaultProcedures()
     }
     if (query.exec(statementUpdateProcedure)) {
         qDebug() << "[CONFIG] Added UpdateRecord stored function.";
+    }
+    if (query.exec(statementDeleteProcedure)) {
+        qDebug() << "[CONFIG] Added DeleteRecord stored function.";
+    }
+    if (query.exec(statementClearProcedure)) {
+        qDebug() << "[CONFIG] Added Clear stored function.";
     }
 }
 
@@ -209,6 +221,19 @@ bool DBManager::update(QString id, QString name, QString surname, QString phone)
     return query.exec(statementUpdate);
 }
 
+bool DBManager::remove(QString id, QString name, QString surname, QString phone)
+{
+    if (id.isEmpty()) id = QString("-1");
+
+    QString statementDelete = QString("SELECT DeleteRecord(%1, '%2', '%3', '%4')").arg(id, name, surname, phone);
+
+    QSqlDatabase db = getDatabase();
+    if (!db.isOpen()) db.open();
+    QSqlQuery query(db);
+
+    return query.exec(statementDelete);
+}
+
 bool DBManager::drop()
 {
     QSqlDatabase db = getDatabase();
@@ -229,22 +254,17 @@ bool DBManager::drop()
     return output;
 }
 
-void DBManager::clean()
+bool DBManager::clean()
 {
     QSqlDatabase db = getDatabase();
     db.setDatabaseName(databaseName);
     if (!db.isOpen()) db.open();
 
-    QString statementClear = QString("DELETE * FROM %1;").arg(tableName);
+    QString statementClear = QString("SELECT Clear()");
     QSqlQuery query(db);
-    if (query.exec(statementClear)) {
-        qDebug() << "[SUCCESS] Table " << tableName << " has been cleaned successfully.";
-    }
-    else {
-        qDebug() << "[ERROR] Could not clear table " << tableName << ": " + query.lastError().text();
-        qDebug() << query.lastQuery();
-    }
+    bool status = query.exec(statementClear);
     db.close();
+    return status;
 }
 
 QStandardItemModel* DBManager::getAll()

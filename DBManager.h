@@ -19,14 +19,14 @@ public:
 
 	// General DB management options
 	void createUser(QString username, QString password, bool admin);
-	void clean();
+	bool clean();
 	bool create();
 	void createTable();
 	bool drop();
 
 	// Basic operations
 	bool insert(QString name, QString surname, QString phone);
-	bool remove();
+	bool remove(QString id = NULL, QString name = NULL, QString surname = NULL, QString phone = NULL);
 	bool update(QString id = NULL, QString name = NULL, QString surname = NULL, QString phone = NULL);
 	QStandardItemModel* search(QString id = NULL, QString name = NULL, QString surname = NULL, QString phone = NULL);
 	QStandardItemModel* getAll();

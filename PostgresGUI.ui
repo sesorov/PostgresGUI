@@ -696,6 +696,38 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>deleteRecordButton</sender>
+   <signal>clicked()</signal>
+   <receiver>PostgresGUIClass</receiver>
+   <slot>deleteRecord()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>513</x>
+     <y>266</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>573</x>
+     <y>10</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>clearDatabaseButton</sender>
+   <signal>clicked()</signal>
+   <receiver>PostgresGUIClass</receiver>
+   <slot>clearDatabase()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>225</x>
+     <y>146</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>563</x>
+     <y>5</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>login()</slot>
@@ -705,5 +737,7 @@
   <slot>addRecord()</slot>
   <slot>search()</slot>
   <slot>updateRecord()</slot>
+  <slot>deleteRecord()</slot>
+  <slot>clearDatabase()</slot>
  </slots>
 </ui>
